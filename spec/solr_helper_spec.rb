@@ -21,6 +21,7 @@ describe SolrHelper do
                               'foobar:another_field' => 'ns:value',
                               'foobar:url' => 'http://foo.bar/',
                               '@id' => 'ignored',
+                              '@type' => 'ignored'
                               },
         'generated' => {'date_group' => '1800 - 1810',
                         'types' => ['Original'],

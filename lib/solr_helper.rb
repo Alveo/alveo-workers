@@ -17,7 +17,7 @@ module SolrHelper
               'ausnc:communication_medium', 'ausnc:audience', 'ausnc:written_mode',
               'ausnc:publication_status']
 
-    excluded = ['@type', '@id', 'alveo:display_document', 'dc:isPartOf', 'dc:created', 'dc:title']
+    excluded = ['@type', '@id', 'dc:isPartOf', 'dc:created', 'dc:title']
 
     item_metadata = item_json_ld['alveo:metadata']
     item_metadata.default = 'unspecified'
