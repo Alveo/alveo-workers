@@ -20,10 +20,10 @@ class PersistentClient
     perform_request(request)
   end
 
-  def perform_request(request)    
+  def perform_request(request)
     response = @connection.request(request)
     if not response.kind_of? Net::HTTPSuccess
-      raise "Error performing request: #{response.message} (#{response.code})"
+      raise "Error performing #{request.method} request to #{request.uri}, response: #{response.message} (#{response.code})"
     end
     response
   end
