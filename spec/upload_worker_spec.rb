@@ -23,11 +23,11 @@ describe UploadWorker do
       example = {'mock' => 'item', 'generated' => {}, 'alveo:metadata' => {'meta' => 'data'}}
       allow(@upload_worker).to receive(:generate_fields).and_return({})
       expected = example.to_json
-      headers = {action: 'create'}
+      headers = {action: 'create', collection: 'testcollection'}
       expect(@exchange).to receive(:publish).with(expected, {routing_key: 'postgres_queue', headers: headers, persistent: true})
       expect(@exchange).to receive(:publish).with(expected, {routing_key: 'solr_queue', headers: headers, persistent: true})
       expect(@exchange).to receive(:publish).with(expected, {routing_key: 'sesane_queue', headers: headers, persistent: true})
-      @upload_worker.create_item(example)
+      @upload_worker.create_item(example, 'testcollection')
     end
 
   end
@@ -35,10 +35,11 @@ describe UploadWorker do
   describe '#process_message' do
 
     it 'creates an item on create action header' do
-      expected = 'item'
-      example_headers = {'action' => 'create'}
-      example_message = {'items' => [expected]}
-      expect(@upload_worker).to receive(:create_item).with(expected)
+      item = 'item'
+      collection = 'testcollection'
+      example_headers = {'action' => 'create', 'collection' => collection}
+      example_message = {'items' => [item]}
+      expect(@upload_worker).to receive(:create_item).with(item, collection)
       @upload_worker.process_message(example_headers, example_message)
     end
 
