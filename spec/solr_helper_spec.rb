@@ -18,7 +18,10 @@ describe SolrHelper do
                               'ausnc:mode' => 'ausnc:written',
                               'ausnc:publication_status' => 'published',
                               'foobar:extra_field' => 'value',
-                              'foobar:another_field' => 'ns:value'},
+                              'foobar:another_field' => 'ns:value',
+                              'foobar:url' => 'http://foo.bar/',
+                              '@id' => 'ignored',
+                              },
         'generated' => {'date_group' => '1800 - 1810',
                         'types' => ['Original'],
                         'handle' => 'collection:identifier',
@@ -55,7 +58,9 @@ describe SolrHelper do
         FOOBAR_extra_field_sim: 'value',
         FOOBAR_extra_field_tesim: 'value',
         FOOBAR_another_field_sim: 'value',
-        FOOBAR_another_field_tesim: 'value'
+        FOOBAR_another_field_tesim: 'value',
+        FOOBAR_url_sim: 'http://foo.bar/',
+        FOOBAR_url_tesim: 'http://foo.bar/'
       }
       actual = solr_helper.create_solr_document(example)
       expect(actual).to eq(expected)

@@ -1,6 +1,14 @@
 module SolrHelper
 
 
+  def remove_ns(value)
+
+      if value.include?(":") and not value.start_with?('http')
+          ns, value = value.split(':')
+      end
+      value
+  end
+
   def create_solr_document(item_json_ld)
 
     # these map to NAMESPACE_name_facet (eg. OLAC_language_facet)
@@ -9,7 +17,7 @@ module SolrHelper
               'ausnc:communication_medium', 'ausnc:audience', 'ausnc:written_mode',
               'ausnc:publication_status']
 
-    excluded = ['dc:isPartOf', 'dc:created', 'dc:title']
+    excluded = ['@type', '@id', 'alveo:display_document', 'dc:isPartOf', 'dc:created', 'dc:title']
 
     item_metadata = item_json_ld['alveo:metadata']
     item_metadata.default = 'unspecified'
@@ -36,11 +44,7 @@ module SolrHelper
     facets.each do |rdfname|
         ns, name = rdfname.split(':')
         key = :"#{ns.upcase}_#{name}_facet"
-        value = item_metadata[rdfname]
-        if value.include?(":")
-            ns, value = value.split(':')
-        end
-        result[key] = value
+        result[key] = remove_ns(item_metadata[rdfname])
     end
 
     # map all other field names to NS_name_sim and NS_name_tesim
@@ -49,9 +53,7 @@ module SolrHelper
         unless facets.include? key or excluded.include? key
             ns, name = key.split(':')
             key = "#{ns.upcase}_#{name}"
-            if value.include?(":")
-                ns, value = value.split(':')
-            end
+            value = remove_ns(value)
             result[:"#{key}_sim"] = value
             result[:"#{key}_tesim"] = value
         end
