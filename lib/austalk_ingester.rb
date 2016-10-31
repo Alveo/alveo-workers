@@ -72,25 +72,18 @@ class AusTalkIngester
   end
 
   def process_chunk(austalk_chunk, resume_point=0)
-    @record_count = 0
-    File.open(austalk_chunk).each { |austalk_record|
-      begin
-        if @record_count < resume_point
-          @record_count += 1
-          next
-        end
-        austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
-        austalk_fields = add_document_sizes(austalk_fields)
-        properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
-        message = austalk_fields.to_json
-        @exchange.publish(message, properties)
-        @record_count += 1
-        break if !@ingesting
-      rescue Exception => e
+
+    austalk_record = File.open(austalk_chunk).read
+    austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
+    austalk_fields = add_document_sizes(austalk_fields)
+    properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: 'austalk'}}
+    message = austalk_fields.to_json
+    @exchange.publish(message, properties)
+
+    rescue Exception => e
         # TODO: Error queue instead of log file
         @error_logger.error "#{e.class}: #{e.to_s}\ninput: #{austalk_record}"
-      end
-    }
+
   end
 
 end
