@@ -32,11 +32,15 @@ module SolrHelper
       DC_title_sim: item_metadata['dc:title'],
       DC_title_tesim: item_metadata['dc:title']    }
 
-    # map facets to given values
+    # map facets to given values, strip namespace from any value
     facets.each do |rdfname|
         ns, name = rdfname.split(':')
         key = :"#{ns.upcase}_#{name}_facet"
-        result[key] = item_metadata[rdfname]
+        value = item_metadata[rdfname]
+        if value.include?(":")
+            ns, value = value.split(':')
+        end
+        result[key] = value
     end
 
     # map all other field names to NS_name_sim and NS_name_tesim
@@ -45,6 +49,9 @@ module SolrHelper
         unless facets.include? key or excluded.include? key
             ns, name = key.split(':')
             key = "#{ns.upcase}_#{name}"
+            if value.include?(":")
+                ns, value = value.split(':')
+            end
             result[:"#{key}_sim"] = value
             result[:"#{key}_tesim"] = value
         end
