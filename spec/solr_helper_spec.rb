@@ -16,7 +16,8 @@ describe SolrHelper do
         'alveo:metadata' => { 'dc:isPartOf' => 'collection',
                               'olac:language' => 'eng',
                               'ausnc:mode' => 'written',
-                              'ausnc:publication_status' => 'published'},
+                              'ausnc:publication_status' => 'published',
+                              'foobar:extra_field' => 'value'},
         'generated' => {'date_group' => '1800 - 1810',
                         'types' => ['Original'],
                         'handle' => 'collection:identifier',
@@ -49,7 +50,9 @@ describe SolrHelper do
         DC_created_sim: 'unspecified',
         DC_created_tesim: 'unspecified',
         DC_title_sim: 'unspecified',
-        DC_title_tesim: 'unspecified'
+        DC_title_tesim: 'unspecified',
+        FOOBAR_extra_field_sim: 'value',
+        FOOBAR_extra_field_tesim: 'value'
       }
       actual = solr_helper.create_solr_document(example)
       expect(actual).to eq(expected)

@@ -15,6 +15,7 @@ require_relative '../lib/solr_helper'
 require_relative '../lib/metadata_helper'
 require_relative '../lib/postgres_helper'
 
+require_relative '../lib/ingester'
 require_relative '../lib/austalk_ingester'
 require_relative '../lib/trove_ingester'
 
@@ -27,10 +28,11 @@ require_relative '../lib/sesame_client'
 require_relative '../lib/persistent_client'
 
 module SpecHelper
-  
-  module ExposePrivate 
+
+  module ExposePrivate
 
       def method_missing(method, *args)
+          puts method
         send(method, *args)
       end
 
