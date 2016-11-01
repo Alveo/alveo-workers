@@ -71,7 +71,7 @@ class AusTalkIngester
     austalk_fields
   end
 
-  def process_chunk(austalk_chunk, resume_point=0)
+  def process_chunk(austalk_chunk, collection, resume_point=0)
 
     austalk_record = File.open(austalk_chunk).read
     austalk_fields = JSON.parse(austalk_record.encode('utf-8'))

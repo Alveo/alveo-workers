@@ -14,7 +14,7 @@ def get_file_paths(directory)
   file_paths = Dir[File.join(directory, '*.json')]
   processed = []
   if File.exists? @processed
-    processed = File.read(@processed).split    
+    processed = File.read(@processed).split
   end
   file_paths.select! { |file|
     !processed.include? file
@@ -31,7 +31,7 @@ def get_file_paths(directory)
   file_paths
 end
 
-def main(options, directory)
+def main(options, collection, directory)
   file_paths = get_file_paths(directory)
   ingester = AusTalkIngester.new(options)
   ingesting = true
@@ -41,7 +41,7 @@ def main(options, directory)
   }
   ingester.connect
   file_paths.each { |file_path|
-    ingester.process_chunk(file_path, @resume_point)
+    ingester.process_chunk(file_path, collection, @resume_point)
     @resume_point = -1
     if ingesting
       File.open(@processed, 'a') { |processed|
@@ -66,6 +66,14 @@ if __FILE__ == $PROGRAM_NAME
   Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   options = config[:ingester]
-  main(options, ARGV[0])
+  # usage ingest_austalk.rb <collection> <dir>
+  # to ingest the named collection from the given directory full of .json files
+  # if collection is ommitted, defaults to 'austalk'
+  if ARGV.length == 1
+      main(options, 'austalk', ARGV[1])
+  elsif ARGV.length == 2
+      main(options, ARGV[0], ARGV[1])
+  else
+      puts "Usage: ingest_austalk.rb <collection>? <dir>"
+  end
 end
-
