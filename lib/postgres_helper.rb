@@ -15,7 +15,7 @@ module PostgresHelper
     item[:collection_id] = item_json_ld['generated']['collection_id']
     item[:primary_text_path] = item_json_ld['alveo:metadata']['alveo:display_document']
     # TODO: gets rid of the fulltext, may not be what we want to do
-    item_json_ld['alveo:metadata'].delete('alveo:fulltext')
+    item_json_ld['alveo:metadata'].delete('alveo:full_text')
     item_json_ld.delete('generated')
     item[:json_metadata] = item_json_ld.to_json
     # TODO: This is a temporary hack, what should happen is that this remains blank

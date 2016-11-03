@@ -76,7 +76,7 @@ class AusTalkIngester
     austalk_record = File.open(austalk_chunk).read
     austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
     austalk_fields = add_document_sizes(austalk_fields)
-    properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: 'austalk'}}
+    properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: collection}}
     message = austalk_fields.to_json
     @exchange.publish(message, properties)
 
