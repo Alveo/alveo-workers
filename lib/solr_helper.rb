@@ -17,7 +17,8 @@ module SolrHelper
               'ausnc:communication_medium', 'ausnc:audience', 'ausnc:written_mode',
               'ausnc:publication_status']
 
-    excluded = ['@type', '@id', 'dc:isPartOf', 'dc:created', 'dc:title']
+    excluded = ['@type', '@id', 'dc:isPartOf', 'dc:created', 'dc:title', 'alveo:full_text',
+                'alveo:indexable_document']
 
     item_metadata = item_json_ld['alveo:metadata']
     item_metadata.default = 'unspecified'
@@ -28,7 +29,7 @@ module SolrHelper
       DC_type_facet: item_json_ld['generated']['types'],
       handle: item_json_ld['generated']['handle'],
       id: item_json_ld['generated']['handle'],
-      full_text: item_metadata['alveo:fulltext'], #TODO: fulltext should be a property of a document
+      full_text: item_metadata['alveo:full_text'], #TODO: fulltext should be a property of a document
       discover_access_group_ssim: "#{item_metadata['dc:isPartOf']}-discover",
       read_access_group_ssim: "#{item_metadata['dc:isPartOf']}-read",
       edit_access_group_ssim: "#{item_metadata['dc:isPartOf']}-edit",
