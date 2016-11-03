@@ -17,7 +17,11 @@ module SesameHelper
     # TODO: this fulltext field is only used by solr,
     # so maybe we should delete it in the upload worker
     # to reduce network traffic
-    item_metadata.delete('alveo:fulltext')
+    item_metadata.delete('alveo:full_text')
+
+    # TODO: should remove dc:source property for
+    # each document since it is a local path
+
     json_ld['@graph'] = [item_metadata]
     ['ausnc:document', '@graph'].each { |key|
       if item_json_ld.has_key? key

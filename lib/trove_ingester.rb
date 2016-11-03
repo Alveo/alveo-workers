@@ -118,7 +118,7 @@ class TroveIngester
             "dc:source": #{trove_fields['titleName'].to_json},
             "dc:title": #{trove_fields['heading'].to_json},
             "dc:isPartOf": "trove",
-            "alveo:fulltext": #{trove_fields['fulltext'].to_json},
+            "alveo:full_text": #{trove_fields['fulltext'].to_json},
             "alveo:display_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
             "alveo:indexable_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
             "olac:language": "eng"
