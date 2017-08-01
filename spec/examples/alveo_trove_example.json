@@ -25,11 +25,11 @@
               "http://trove.alveo.edu.au/document/64154494#Text",
               "http://trove.alveo.edu.au/document/64154494#Original"
             ],
-            "dc:created": "1917-02-02",
-            "dc:identifier": "64154494",
-            "dc:source": "The Broadford Courier (Broadford, Vic. : 1916 - 1920)",
-            "dc:title": "ORIGIN OF THE CORONER'S JURY.",
-            "dc:isPartOf": "trove",
+            "dcterms:created": "1917-02-02",
+            "dcterms:identifier": "64154494",
+            "dcterms:source": "The Broadford Courier (Broadford, Vic. : 1916 - 1920)",
+            "dcterms:title": "ORIGIN OF THE CORONER'S JURY.",
+            "dcterms:isPartOf": "trove",
             "alveo:fulltext": "ORIGIN OF THE CORONER'S JURY The following circumstances first occasioned the institution of coroner's juries. A gentlewoman in London, after having buried six husbands, found a gentleman hardy enough to make her a wife once more. For several months their happiness seemed to pay no great compliment to her former partners, who, as she said, had disgusted her by their sottishness. Knowing the real character of his mate, the gentleman began frequently to absent himself, to return at late hours, and when he did return, to appear as if intoxicated. At first reproaches, but after menaces, were the consequences of his conduct. The gentleman persisted, anti seemed every day to become more addicted to the bottle. One evening, when she imagined him dead drunk, she unsowed a leaden weight from the sleeve of her gown, and having melted it, she approached her husband, who pretended to be still sound asleep, in order to pour it Into his ear through a pipe. Convinced of her wickedness, he started tip and seized her; when, having procured nassitance, he secured her till morning, and conducted her before a, magistrate, who committed her to prison. The bodies of her six husbands were taken up, and as marks of violence were still visible upon them, the proof of her guilt appeared so strong upon her trial that she was condemned and executed on October 17, 1698. To this circumstance, It is said, England is indebted for that useful regulation by which no corpse can be interred in this kingdom without a legal inspection.",
             "alveo:display_document": "http://trove.alveo.edu.au/document/64154494#Text",
             "alveo:indexable_document": "http://trove.alveo.edu.au/document/64154494#Text",
@@ -38,21 +38,21 @@
           "ausnc:document": [{
             "@id":"http://trove.alveo.edu.au/document/64154494#Text",
             "@type":"foaf:Document",
-            "dc:extent": 1523,
-            "dc:identifier": "64154494.txt",
-            "dc:title": "64154494#Text",
-            "dc:source": "http://trove.alveo.edu.au/document/64154494.txt",
-            "dc:type": "Text",
+            "dcterms:extent": 1523,
+            "dcterms:identifier": "64154494.txt",
+            "dcterms:title": "64154494#Text",
+            "dcterms:source": "http://trove.alveo.edu.au/document/64154494.txt",
+            "dcterms:type": "Text",
             "alveo:size": 1523
           },
           {
             "@id":"http://trove.alveo.edu.au/document/64154494#Original",
             "@type":"foaf:Document",
-            "dc:extent": 1899,
-            "dc:identifier": "64154494",
-            "dc:title": "64154494#Original",
-            "dc:source": "http://trove.alveo.edu.au/document/64154494",
-            "dc:type": "Original",
+            "dcterms:extent": 1899,
+            "dcterms:identifier": "64154494",
+            "dcterms:title": "64154494#Original",
+            "dcterms:source": "http://trove.alveo.edu.au/document/64154494",
+            "dcterms:type": "Original",
             "alveo:size": 1899
           }
         ]

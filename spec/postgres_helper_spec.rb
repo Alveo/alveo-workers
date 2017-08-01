@@ -17,9 +17,9 @@ describe PostgresHelper do
                                       'alveo:display_document' => '/primary/text/path'},
                  'generated' => {'handle' => 'collection:identifier',
                                  'collection_id' => 3},
-                 'ausnc:document' => [{'dc:identifier' => 'primary_text.txt',
-                 'dc:source' => '/path/to/primary_text.txt',
-                 'dc:type' => 'Original'}]}
+                 'ausnc:document' => [{'dcterms:identifier' => 'primary_text.txt',
+                 'dcterms:source' => '/path/to/primary_text.txt',
+                 'dcterms:type' => 'Original'}]}
       time = Time.new(1997)
       expect(Time).to receive(:now).and_return(time)
       json_metadata = example.clone
@@ -45,9 +45,9 @@ describe PostgresHelper do
   describe '#extract_documents_info' do
 
     it 'it builds an array of document info hashes' do
-      example = {'ausnc:document' => [{'dc:identifier' => 'primary_text.txt',
-                 'dc:source' => '/path/to/primary_text.txt',
-                 'dc:type' => 'Original'}]}
+      example = {'ausnc:document' => [{'dcterms:identifier' => 'primary_text.txt',
+                 'dcterms:source' => '/path/to/primary_text.txt',
+                 'dcterms:type' => 'Original'}]}
       expected = [{file_name: 'primary_text.txt',
                   file_path: '/path/to/primary_text.txt',
                   doc_type: 'Original',
@@ -61,9 +61,9 @@ describe PostgresHelper do
   describe '#extract_document_info' do
 
     it 'builds a document info hash' do
-      example = {'dc:identifier' => 'primary_text.txt',
-                 'dc:source' => '/path/to/primary_text.txt',
-                 'dc:type' => 'Original'}
+      example = {'dcterms:identifier' => 'primary_text.txt',
+                 'dcterms:source' => '/path/to/primary_text.txt',
+                 'dcterms:type' => 'Original'}
       expected = {file_name: 'primary_text.txt',
                   file_path: '/path/to/primary_text.txt',
                   doc_type: 'Original',

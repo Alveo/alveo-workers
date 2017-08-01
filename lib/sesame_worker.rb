@@ -58,7 +58,7 @@ class SesameWorker < Worker
   def process_message(headers, message)
     if headers['action'] == 'create'
       collection = headers['collection']
-      #collection = message['alveo:metadata']['dc:isPartOf']
+      #collection = message['alveo:metadata']['dcterms:isPartOf']
       rdf_graph = create_rdf_graph(message)
       if @batch_options[:enabled]
         batch_create(collection, rdf_graph)

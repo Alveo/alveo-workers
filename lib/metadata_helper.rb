@@ -25,14 +25,14 @@ module MetadataHelper
   end
 
   def get_collection(item)
-    name = item['alveo:metadata']['dc:isPartOf']
+    name = item['alveo:metadata']['dcterms:isPartOf']
     if @@COLLECTIONS.has_key? name
       collection = @@COLLECTIONS[name]
     else
       # TODO: super dodgy, fix this
       config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
       ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
-      ar_collection = Collection.find_by_name(name) 
+      ar_collection = Collection.find_by_name(name)
       collection = {id: ar_collection.id, owner: ar_collection.owner.email}
       @@COLLECTIONS[name] = collection
       ActiveRecord::Base.connection.close
@@ -41,15 +41,15 @@ module MetadataHelper
   end
 
   def get_handle(item)
-    collection = item['alveo:metadata']['dc:isPartOf']
-    identifier = item['alveo:metadata']['dc:identifier']
+    collection = item['alveo:metadata']['dcterms:isPartOf']
+    identifier = item['alveo:metadata']['dcterms:identifier']
     "#{collection}:#{identifier}"
   end
 
   def get_types(item_metadata)
     types = []
     item_metadata['ausnc:document'].each { |document|
-      type = document.has_key?('dc:type') ? document['dc:type'] : 'unspecified'
+      type = document.has_key?('dcterms:type') ? document['dcterms:type'] : 'unspecified'
       types << type
     }
     types
@@ -60,12 +60,12 @@ module MetadataHelper
   #   date_group('6 September 1986') => '1980 - 1989'
   #   date_group('6 September 1986', 20) => '1980 - 1999'
   #
-  # Takes the year from a `dc:created` string and returns the range
+  # Takes the year from a `dcterms:created` string and returns the range
   # that it falls within, as specified by optional resolution parameter
 
   def get_date_group(item, resolution=10)
     result = 'Unknown'
-    date_string = item['alveo:metadata']['dc:created']
+    date_string = item['alveo:metadata']['dcterms:created']
     unless date_string.nil?
       begin
         year = extract_year(date_string)
@@ -85,7 +85,7 @@ module MetadataHelper
   #   extract_year('6 September 1986') => 1986
   #   extract_year('Phase I fall') => 'Unknown'
   #
-  # Extracts the year from a dc:created string. Handles the following examples
+  # Extracts the year from a dcterms:created string. Handles the following examples
   #
   # * "1913?"
   # * "30/10/93"

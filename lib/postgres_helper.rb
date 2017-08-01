@@ -37,9 +37,9 @@ module PostgresHelper
 
   def extract_document_info(document_json_ld)
     document = {}
-    document[:file_name] = document_json_ld['dc:identifier']
-    document[:file_path] = document_json_ld['dc:source']
-    document[:doc_type] = document_json_ld['dc:type']
+    document[:file_name] = document_json_ld['dcterms:identifier']
+    document[:file_path] = document_json_ld['dcterms:source']
+    document[:doc_type] = document_json_ld['dcterms:type']
     document[:mime_type] = Rack::Mime.mime_type(File.extname(document[:file_name]))
     document
   end

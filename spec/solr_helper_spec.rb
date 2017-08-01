@@ -13,7 +13,7 @@ describe SolrHelper do
 
     it 'creates a Solr document has from a JSON-LD metadata hash' do
       example = {
-        'alveo:metadata' => { 'dc:isPartOf' => 'collection',
+        'alveo:metadata' => { 'dcterms:isPartOf' => 'collection',
                               'olac:language' => 'eng',
                               'ausnc:mode' => 'ausnc:written',
                               'ausnc:publication_status' => 'published',

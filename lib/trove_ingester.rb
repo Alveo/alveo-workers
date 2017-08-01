@@ -113,11 +113,11 @@ class TroveIngester
               "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
               "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Original"
             ],
-            "dc:created": "#{trove_fields['date']}",
-            "dc:identifier": "#{trove_fields['id']}",
-            "dc:source": #{trove_fields['titleName'].to_json},
-            "dc:title": #{trove_fields['heading'].to_json},
-            "dc:isPartOf": "trove",
+            "dcterms:created": "#{trove_fields['date']}",
+            "dcterms:identifier": "#{trove_fields['id']}",
+            "dcterms:source": #{trove_fields['titleName'].to_json},
+            "dcterms:title": #{trove_fields['heading'].to_json},
+            "dcterms:isPartOf": "trove",
             "alveo:full_text": #{trove_fields['fulltext'].to_json},
             "alveo:display_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
             "alveo:indexable_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
@@ -126,21 +126,21 @@ class TroveIngester
           "ausnc:document": [{
             "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
             "@type":"foaf:Document",
-            "dc:extent": #{trove_fields['fulltext'].size},
-            "dc:identifier": "#{trove_fields['id']}.txt",
-            "dc:title": "#{trove_fields['id']}#Text",
-            "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}.txt",
-            "dc:type": "Text",
+            "dcterms:extent": #{trove_fields['fulltext'].size},
+            "dcterms:identifier": "#{trove_fields['id']}.txt",
+            "dcterms:title": "#{trove_fields['id']}#Text",
+            "dcterms:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}.txt",
+            "dcterms:type": "Text",
             "alveo:size": #{trove_fields['fulltext'].bytesize}
           },
           {
             "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}#Original",
             "@type":"foaf:Document",
-            "dc:extent": #{trove_record.size},
-            "dc:identifier": "#{trove_fields['id']}",
-            "dc:title": "#{trove_fields['id']}#Original",
-            "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
-            "dc:type": "Original",
+            "dcterms:extent": #{trove_record.size},
+            "dcterms:identifier": "#{trove_fields['id']}",
+            "dcterms:title": "#{trove_fields['id']}#Original",
+            "dcterms:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "dcterms:type": "Original",
             "alveo:size": #{trove_record.bytesize}
           }
         ]

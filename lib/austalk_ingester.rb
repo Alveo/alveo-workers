@@ -63,9 +63,9 @@ class AusTalkIngester
   def add_document_sizes(austalk_fields)
     austalk_fields['items'].each { |item|
       item['ausnc:document'].each { |document|
-        size = File.size? document['dc:source']
+        size = File.size? document['dcterms:source']
         document['alveo:size'] = size
-        document['dc:extent'] = size
+        document['dcterms:extent'] = size
       }
     }
     austalk_fields

@@ -19,7 +19,7 @@ module SesameHelper
     # to reduce network traffic
     item_metadata.delete('alveo:full_text')
 
-    # TODO: should remove dc:source property for
+    # TODO: should remove dcterms:source property for
     # each document since it is a local path
 
     json_ld['@graph'] = [item_metadata]

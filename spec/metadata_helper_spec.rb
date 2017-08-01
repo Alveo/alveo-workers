@@ -10,13 +10,13 @@ describe MetadataHelper do
     it 'generates additional fields used by other workers' do
       example = {
         'alveo:metadata' => {
-          'dc:created' => '1994',
-          'dc:isPartOf' => 'collection',
-          'dc:identifier' => 'identifier',
+          'dcterms:created' => '1994',
+          'dcterms:isPartOf' => 'collection',
+          'dcterms:identifier' => 'identifier',
         },
         'ausnc:document' => [
-          {'dc:type' => 'Text'},
-          {'dc:type' => 'Audio'}
+          {'dcterms:type' => 'Text'},
+          {'dcterms:type' => 'Audio'}
         ]
       }
       allow(metadata_helper).to receive(:get_collection).and_return({owner: 'data_owner@intersect.org.au', id: 3})
@@ -46,7 +46,7 @@ describe MetadataHelper do
       MetadataHelper.class_variable_set(:@@COLLECTIONS, {'collection' => collection})
       example = {
         'alveo:metadata' => {
-          'dc:isPartOf' => 'collection',
+          'dcterms:isPartOf' => 'collection',
         }
       }
       expected = collection
@@ -60,8 +60,8 @@ describe MetadataHelper do
   describe '#get_handle' do
 
     it 'Generates a handle from the collection and identifier metadata' do
-      example = {'alveo:metadata' => {'dc:isPartOf' => 'collection',
-                'dc:identifier' => 'identifier'}}
+      example = {'alveo:metadata' => {'dcterms:isPartOf' => 'collection',
+                'dcterms:identifier' => 'identifier'}}
       expected = 'collection:identifier'
       actual = metadata_helper.get_handle(example)
       expect(actual).to eq(expected)
@@ -72,14 +72,14 @@ describe MetadataHelper do
 
   describe '#get_types' do
 
-    it 'returns the documents types in the dc:type field' do
-      example = {'ausnc:document' => [{'dc:type' => 'Text'}, {'dc:type' => 'Audio'}]}
+    it 'returns the documents types in the dcterms:type field' do
+      example = {'ausnc:document' => [{'dcterms:type' => 'Text'}, {'dcterms:type' => 'Audio'}]}
       expected = ['Text', 'Audio']
       actual = metadata_helper.get_types(example)
       expect(actual).to eq(expected)
     end
 
-    it 'returns the "unspecified" types if the dc:type field is not present' do
+    it 'returns the "unspecified" types if the dcterms:type field is not present' do
       example = {'ausnc:document' => [{}]}
       expected = ['unspecified']
       actual = metadata_helper.get_types(example)
@@ -92,22 +92,22 @@ describe MetadataHelper do
   describe '#get_date_group' do
 
     it 'returns a default range of 10' do
-      example = {'alveo:metadata' => {'dc:created' => '1994'}}
+      example = {'alveo:metadata' => {'dcterms:created' => '1994'}}
       test_get_date_group(example, '1990 - 1999')
     end
 
     it 'returns an arbitrary range' do
-      example = {'alveo:metadata' => {'dc:created' => '1994'}}
+      example = {'alveo:metadata' => {'dcterms:created' => '1994'}}
       test_get_date_group(example, '1988 - 1994', 7)
     end
 
     it 'returns "Unknown" for bad input' do
-      example = {'alveo:metadata' => {'dc:created' => 'wutang clan'}}
+      example = {'alveo:metadata' => {'dcterms:created' => 'wutang clan'}}
       test_get_date_group(example, 'Unknown')
     end
     
     it 'returns "Unknown" for nil' do
-      example = {'alveo:metadata' => {'dc:created' => nil}}
+      example = {'alveo:metadata' => {'dcterms:created' => nil}}
       test_get_date_group(example, 'Unknown')
     end
 

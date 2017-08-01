@@ -17,29 +17,29 @@ module SolrHelper
               'ausnc:communication_medium', 'ausnc:audience', 'ausnc:written_mode',
               'ausnc:publication_status']
 
-    excluded = ['@type', '@id', 'dc:isPartOf', 'dc:created', 'dc:title', 'alveo:full_text',
+    excluded = ['@type', '@id', 'dcterms:isPartOf', 'dcterms:created', 'dcterms:title', 'alveo:full_text',
                 'alveo:indexable_document']
 
     item_metadata = item_json_ld['alveo:metadata']
     item_metadata.default = 'unspecified'
 
     result = {
-      collection_name_facet: item_metadata['dc:isPartOf'],
+      collection_name_facet: item_metadata['dcterms:isPartOf'],
       date_group_facet: item_json_ld['generated']['date_group'],
       DC_type_facet: item_json_ld['generated']['types'],
       handle: item_json_ld['generated']['handle'],
       id: item_json_ld['generated']['handle'],
       full_text: item_metadata['alveo:full_text'], #TODO: fulltext should be a property of a document
-      discover_access_group_ssim: "#{item_metadata['dc:isPartOf']}-discover",
-      read_access_group_ssim: "#{item_metadata['dc:isPartOf']}-read",
-      edit_access_group_ssim: "#{item_metadata['dc:isPartOf']}-edit",
+      discover_access_group_ssim: "#{item_metadata['dcterms:isPartOf']}-discover",
+      read_access_group_ssim: "#{item_metadata['dcterms:isPartOf']}-read",
+      edit_access_group_ssim: "#{item_metadata['dcterms:isPartOf']}-edit",
       discover_access_person_ssim: item_json_ld['generated']['owner'],
       read_access_person_ssim: item_json_ld['generated']['owner'],
       edit_access_person_ssim: item_json_ld['generated']['owner'],
-      DC_created_sim: item_metadata['dc:created'],
-      DC_created_tesim: item_metadata['dc:created'],
-      DC_title_sim: item_metadata['dc:title'],
-      DC_title_tesim: item_metadata['dc:title']    }
+      DC_created_sim: item_metadata['dcterms:created'],
+      DC_created_tesim: item_metadata['dcterms:created'],
+      DC_title_sim: item_metadata['dcterms:title'],
+      DC_title_tesim: item_metadata['dcterms:title']    }
 
     # map facets to given values, strip namespace from any value
     facets.each do |rdfname|
