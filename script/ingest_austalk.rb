@@ -70,7 +70,7 @@ if __FILE__ == $PROGRAM_NAME
   # to ingest the named collection from the given directory full of .json files
   # if collection is ommitted, defaults to 'austalk'
   if ARGV.length == 1
-      main(options, 'austalk', ARGV[1])
+      main(options, 'austalk', ARGV[0])
   elsif ARGV.length == 2
       main(options, ARGV[0], ARGV[1])
   else

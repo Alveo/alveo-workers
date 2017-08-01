@@ -26,6 +26,8 @@ module MetadataHelper
 
   def get_collection(item)
     name = item['alveo:metadata']['dcterms:isPartOf']
+    # name may be a URI - take last part if it is
+    name = name.split('/')[-1]
     if @@COLLECTIONS.has_key? name
       collection = @@COLLECTIONS[name]
     else
