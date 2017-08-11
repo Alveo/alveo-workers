@@ -45,8 +45,8 @@ describe Ingester do
       collection = 'collection'
       example = 'item-metadata.rdf'
       allow(@ingester).to receive(:process_metadata_rdf).and_raise(StandardError)
-      error_logger = @ingester.instance_variable_get(:@error_logger)
-      expect(error_logger).to receive(:error)
+      logger = @ingester.instance_variable_get(:@logger)
+      expect(logger).to receive(:error)
       @ingester.process_job(collection, [example])
     end
 

@@ -13,7 +13,7 @@ class TroveIngester
     bunny_client_class = Module.const_get(options[:client_class])
     @bunny_client = bunny_client_class.new(options)
     @exchange_name = options[:exchange]
-    @error_logger = Logger.new(options[:error_log])
+    @logger = Logger.new(options[:error_log])
     @upload_queue_name = options[:upload_queue]
   end
 
@@ -77,7 +77,7 @@ class TroveIngester
         break if !@ingesting
       rescue Exception => e
         # TODO: Error queue instead of log file
-        @error_logger.error "#{e.class}: #{e.to_s}\ninput: #{trove_record}"
+        @logger.error "#{e.class}: #{e.to_s}\ninput: #{trove_record}"
       end
     }
   end

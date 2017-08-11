@@ -17,7 +17,7 @@ Upload worker does the vast majority of the actual work: it takes messages conta
 
 The greater system additionally includes the public facing Alveo server, which makes use of the data stores, and an Ingest server. There are two routes to getting jobs onto the work queue. The first is via the Ingester server, which has creates messages and places on the Upload queue (which would perhaps be more aptly named the 'Ingest' queue). It does this by reading RoboChef'd metadata stored on an RDSI mount. This is the private route for getting data into the system, and is analogous to the original ingest method.
 
-The second route is via Alveo's public API. Instead of reading data/metadata off an RDSI mount and formatting it into JSON-LD, the user performs a request to ingest and item and provides the necessary metadata. Alveo performs the authentication/authorisation, and ultimately places the data within the request onto the Upload queue. Once the data has been recieved by the Upload queue, its flow into the rest of the system is the same regardless of the initial route into the system.
+The second route is via Alveo's public API. Instead of reading data/metadata off an RDSI mount and formatting it into JSON-LD, the user performs a request to ingest an item and provides the necessary metadata. Alveo performs the authentication/authorisation, and ultimately places the data within the request onto the Upload queue. Once the data has been received by the Upload queue, its flow into the rest of the system is the same regardless of the initial route into the system.
 
 ### Scaling Ingest
 

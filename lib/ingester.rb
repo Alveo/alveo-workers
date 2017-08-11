@@ -10,7 +10,7 @@ class Ingester
     @exchange_name = options[:exchange]
     @upload_queue_name = options[:upload_queue]
     @sesame_queue_name = options[:sesame_queue]
-    @error_logger = Logger.new(options[:error_log])
+    @logger = Logger.new(options[:error_log])
   end
 
   def connect
@@ -46,7 +46,7 @@ class Ingester
         end
         add_to_sesame(collection, file_path)
       rescue  Exception => e
-        @error_logger.error "#{e.class}: #{e.to_s}"
+        @logger.error "#{e.class}: #{e.to_s}"
       end
     }
   end

@@ -12,7 +12,7 @@ class AusTalkIngester
     bunny_client_class = Module.const_get(options[:client_class])
     @bunny_client = bunny_client_class.new(options)
     @exchange_name = options[:exchange]
-    @error_logger = Logger.new(options[:error_log])
+    @logger = Logger.new(options[:error_log])
     @upload_queue_name = options[:upload_queue]
   end
 
@@ -56,7 +56,7 @@ class AusTalkIngester
 
   def process()
     @work.each { |austalk_chunk|
-      process_chunk(austalk_chunk)
+      process_chunk(austalk_chunk, 'austalk')
     }
   end
 
@@ -72,18 +72,30 @@ class AusTalkIngester
   end
 
   def process_chunk(austalk_chunk, collection, resume_point=0)
+    @logger.info "process_chunk: austalk_chunk[#{austalk_chunk}], collection[#{collection}], resume_point[#{resume_point}]"
 
-    austalk_record = File.open(austalk_chunk).read
-    austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
-    austalk_fields = add_document_sizes(austalk_fields)
-    properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: collection}}
-    message = austalk_fields.to_json
-    @exchange.publish(message, properties)
+    begin
+      austalk_record = File.open(austalk_chunk).read
+      @logger.info "process_chunk: austalk_record[#{austalk_record}]"
 
+      austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
+      @logger.info "process_chunk: austalk_fields[#{austalk_fields}]"
+
+      austalk_fields = add_document_sizes(austalk_fields)
+      @logger.info "process_chunk: austalk_fields[#{austalk_fields}]"
+
+      properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: collection}}
+      @logger.info "process_chunk: properties[#{properties}]"
+
+      message = austalk_fields.to_json
+      @logger.debug "process_chunk: message[#{message}]"
+
+      @exchange.publish(message, properties)
     rescue Exception => e
-        # TODO: Error queue instead of log file
-        @error_logger.error "#{e.class}: #{e.to_s}\ninput: #{austalk_record}"
-
+      # TODO: Error queue instead of log file
+      # @logger.error "#{e.class}: #{e.to_s}\ninput: #{austalk_record}"
+      @logger.error "process_chunk: exception[#{e.message}]"
+    end
   end
 
 end
