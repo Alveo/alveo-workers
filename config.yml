@@ -1,18 +1,39 @@
 ---
+:common:
+  :worker_log: worker.log
+  :ingester_log: ingester.log
+
 :solr: &solr_common
-  url: http://10.0.0.7:8080/solr/hcsvlab
+  # development
+  url: http://localhost:8983/solr/development
+  # staging
+  # url: http://10.0.0.20:8080/solr/hcsvlab
+  # production
+  # url: http://10.0.0.7:8080/solr/hcsvlab
 
 :rabbitmq: &rabbitmq_common
   :client_class: Bunny
   :error_queue: error
-  :host: 10.0.0.14
-  :port: 5673
+  # development
+  :host: 127.0.0.1
+  # staging
+  #:host: 127.0.0.1
+  # production
+  #:host: 10.0.0.14
+  :port: 5672
+  # production
+  # :port: 5673
   :vhost: /alveo
   :exchange: 'alveo.workers'
   :prefetch: 1000
 
 :sesame_worker:
-  :base_url: http://10.0.0.11:8080/openrdf-sesame/
+  # development
+  :base_url: http://localhost:8983/openrdf-sesame/
+  # staging
+  #:base_url: http://10.0.0.26:8080/openrdf-sesame/
+  # production
+  #:base_url: http://10.0.0.11:8080/openrdf-sesame/
   :client_class: SesameClient
   :work_queue: sesame
   :paths:
@@ -29,7 +50,13 @@
     :timeout: 180
 
 :solr_worker:
-  :url: http://10.0.0.7:8080/solr/hcsvlab
+  # development
+  :url: http://localhost:8983/solr/development
+  # staging
+  #:url: http://10.0.0.20:8080/solr/hcsvlab
+  # production
+  #:url: http://10.0.0.7:8080/solr/hcsvlab
+
   :client_class: RSolr
   :rabbitmq:
     <<: *rabbitmq_common
@@ -63,8 +90,13 @@
     :adapter: postgresql
     :database: hcsvlab
     :username: hcsvlab
-    :password: alveo
-    :host: 10.0.0.13
+    :password: hcsvlab
+    # development
+    :host: 127.0.0.1
+    # staging
+    #:host: 127.0.0.1
+    # production
+    #:host: 10.0.0.13
   :batch:
     :enabled: true
     :size: 5000
@@ -72,7 +104,6 @@
 
 :ingester:
   <<: *rabbitmq_common
-  :error_log: ingester_errors.log
   :user: ingester
   :pass: ingester
   :upload_queue: upload

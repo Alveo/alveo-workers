@@ -3,11 +3,13 @@ require 'models/item'
 require 'models/document'
 require 'models/collection'
 require 'models/user'
+require 'easy_logging'
 
 module MetadataHelper
 
-  @@COLLECTIONS = {}
+  include EasyLogging
 
+  @@COLLECTIONS = {}
 
   def is_item?(jsonld)
     not jsonld['alveo:metadata'].empty?
@@ -79,6 +81,7 @@ module MetadataHelper
         result = "#{range_start} - #{range_end}"
       rescue ArgumentError
         # TODO: Log error
+        @logger.error "get_date_group: item[#{item}], resolution[#{resolution}], error[#{ArgumentError}]"
       end
     end
     result

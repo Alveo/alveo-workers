@@ -1,4 +1,5 @@
 require 'rsolr'
+require 'easy_logging'
 require_relative 'worker'
 require_relative 'solr_helper'
 
@@ -8,8 +9,12 @@ class SolrWorker < Worker
   #   - MonkeyPatch persistent HTTP connections
 
   include SolrHelper
+  include EasyLogging
 
   def initialize(options)
+    # EasyLogging.log_destination = options[:logger]
+    logger.debug "#initialize"
+
     rabbitmq_options = options[:rabbitmq]
     super(rabbitmq_options)
     solr_client_class = Module.const_get(options[:client_class])
@@ -19,10 +24,14 @@ class SolrWorker < Worker
       @batch = []
       @batch_mutex = Mutex.new
     end
+
+
   end
 
   # TODO: this could possible be refactored to super class
   def start_batch_monitor
+    logger.debug "#start_batch_monitor"
+
     @batch_monitor = Thread.new {
       loop {
         sleep @batch_options[:timeout]
@@ -51,6 +60,8 @@ class SolrWorker < Worker
   end
 
   def process_message(headers, message)
+    logger.debug "#process_message"
+
     if headers['action'] == 'create'
       document = create_solr_document(message)
       if @batch_options[:enabled]
@@ -63,6 +74,8 @@ class SolrWorker < Worker
 
 
   def commit_batch
+    logger.debug "#commit_batch"
+
     @batch_mutex.synchronize {
       if !@batch.empty?
         add_documents(@batch)
@@ -72,18 +85,35 @@ class SolrWorker < Worker
   end
 
   def add_documents(documents)
+    logger.debug "#add_documents: documents[#{documents.size}]"
+
     response = @solr_client.add(documents)
+
+    logger.debug "add_documents: response[#{response}]"
+
     status = response['responseHeader']['status']
     if status != 0
-      raise "Solr returned an unexpected status: #{status}"
+      msg = "Solr returned an unexpected status: #{status}"
+      logger.error "add_documents: #{msg}"
+
+      raise msg
     end
+
+    logger.info "add_documents: response status[#{status}]"
+
     @solr_client.commit
+
+    logger.info "add_documents: add documents to RSolr successfully done with response[#{status}]"
   end
 
   def batch_create(document)
+    logger.debug "#batch_create: document[#{document.size}]"
+
     @batch_mutex.synchronize {
       @batch << document
     }
+
+    logger.debug "batch_create: current document(s)/batch size[#{@batch.size}/#{@batch_options[:size]}]"
     if (@batch.size >= @batch_options[:size])
       commit_batch
     end

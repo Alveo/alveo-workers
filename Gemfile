@@ -10,6 +10,7 @@ gem 'pg'
 gem 'activerecord'
 gem 'activerecord-import'
 gem 'rack'
+gem 'easy_logging'
 
 group :test do
   gem 'rspec', :require => false

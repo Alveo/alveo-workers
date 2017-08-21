@@ -2,12 +2,16 @@ require 'net/http/persistent'
 require 'json'
 require_relative 'net_http_overrides'
 require_relative 'persistent_client'
+require 'easy_logging'
 
 class SesameClient < PersistentClient
+
+  include EasyLogging
 
   @@PATHS = {}
 
   def initialize(config)
+    logger.debug "#initialize"
     @base_url = config[:base_url]
     @paths = config[:paths]
     @config = config
@@ -20,9 +24,14 @@ class SesameClient < PersistentClient
   end
 
   def create_repository(name)
+    logger.debug "#create_repository: name[#{name}]"
+
     existing_repositories = repositories
     if existing_repositories.include? name
-      raise "Repository already contains a collection named #{name}"
+      msg = "Repository already contains a collection named #{name}"
+      logger.error "create_repository: #{msg}"
+
+      raise msg
     end
     uri = get_statements_uri('SYSTEM')
     body = get_repository_template(name)
@@ -59,21 +68,28 @@ class SesameClient < PersistentClient
   end
 
   def insert_statements(repository, ttl_string)
+    logger.debug "#insert_statements: repository[#{repository}], ttl_string[#{ttl_string}]"
     uri = get_statements_uri(repository)
     request(uri, :post, {'Content-Type' => @mime_types[:turtle]}, ttl_string)
   end
 
   def batch_insert_statements(repository, n3_string)
+    logger.debug "#batch_insert_statements: repository[#{repository}], n3_string[#{n3_string.length}]"
+
     uri = get_statements_uri(repository)
     request(uri, :post, {'Content-Type' => @mime_types[:n3]}, n3_string)
   end
 
   def clear_repository(repository)
+    logger.debug "#clear_repository: repository[#{repository}]"
+
     uri = get_statements_uri(repository)
     request(uri, :delete)
   end
 
   def repositories
+    logger.debug "#repositories"
+
     uri = get_repositories_uri
     repositories = []
     query_results = parse_json_response(request(uri, :get, {'Accept' => @mime_types[:sparql_json]}))
@@ -85,14 +101,19 @@ class SesameClient < PersistentClient
   end
 
   def get_repositories_uri
+    logger.debug "#get_repositories_uri"
+
     URI.join(@base_url, 'repositories')
   end
 
   def get_statements_uri(repository)
+    logger.debug "#get_statements_uri: repository[#{repository}]"
+
     statements_path = "repositories/#{repository}/statements"
-    URI.join(@base_url, statements_path)
+    rlt = URI.join(@base_url, statements_path)
+    logger.debug "get_statements_uri: @base_url[#{@base_url}], statements_path[#{statements_path}], rlt[#{rlt}]"
+
+    rlt
   end
-
-
 
 end

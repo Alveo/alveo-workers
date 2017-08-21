@@ -1,5 +1,6 @@
 require 'rdf'
 require 'rdf/turtle'
+require 'easy_logging'
 
 require_relative 'worker'
 require_relative 'sesame_client'
@@ -8,8 +9,10 @@ require_relative 'sesame_helper'
 class SesameWorker < Worker
 
   include SesameHelper
+  include EasyLogging
 
   def initialize(options)
+    logger.debug "#initialize"
     rabbitmq_options = options[:rabbitmq]
     super(rabbitmq_options)
     sesame_client_class = Module.const_get(options[:client_class])
@@ -23,6 +26,8 @@ class SesameWorker < Worker
   end
 
   def start_batch_monitor
+    logger.debug "#start_batch_monitor"
+
     @batch_monitor = Thread.new {
       loop {
         sleep @batch_options[:timeout]
@@ -32,6 +37,7 @@ class SesameWorker < Worker
   end
 
   def start
+    logger.debug "#start"
     super
     if @batch_options[:enabled]
       start_batch_monitor
@@ -39,6 +45,7 @@ class SesameWorker < Worker
   end
 
   def stop
+    logger.debug "#stop"
     super
     if @batch_options[:enabled]
       @batch_monitor.kill
@@ -47,15 +54,19 @@ class SesameWorker < Worker
   end
 
   def close
+    logger.debug "#close"
     super
     @sesame_client.close
   end
 
   def connect
+    logger.debug "#connect"
     super
   end
 
   def process_message(headers, message)
+    logger.debug "#process_message"
+
     if headers['action'] == 'create'
       collection = headers['collection']
       #collection = message['alveo:metadata']['dcterms:isPartOf']
@@ -69,6 +80,8 @@ class SesameWorker < Worker
   end
 
   def commit_batch
+    logger.debug "#commit_batch"
+
     @batch_mutex.synchronize {
       if !@batch.empty?
         n3_string = RDF::NTriples::Writer.dump(@batch, nil, :encoding => Encoding::ASCII)
@@ -80,6 +93,7 @@ class SesameWorker < Worker
           }
         else
           @sesame_client.batch_insert_statements(@collection, n3_string)
+          logger.info "commit_batch: insert statements to SesameClient done"
         end
         @batch.clear!
       end
@@ -87,11 +101,15 @@ class SesameWorker < Worker
   end
 
   def insert_statements(collection, rdf_graph)
+    logger.debug "#insert_statements"
+
     # TODO: this is inconsistant with the batch interface
     @sesame_client.insert_statements(@collection, message['payload'])
   end
 
   def batch_create(collection, rdf_graph)
+    logger.debug "#batch_create: collection[#{collection}], rdf_graph[#{rdf_graph.size}]"
+
     # TODO: This is flawed - if multiple collections are processed
     # at the same time, it can result in statements being inserted
     # into the wrong collection. It may be better to maintain a hash

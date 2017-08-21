@@ -7,6 +7,9 @@ require 'upload_worker'
 require 'solr_worker'
 require 'sesame_worker'
 require 'postgres_worker'
+require 'easy_logging'
+
+include EasyLogging
 
 def main(options)
   worker_classes = options.worker_classes
@@ -65,6 +68,9 @@ def parse_options(args)
   parsed_options.processes = 1
   parsed_options.worker_classes = [UploadWorker, SolrWorker, SesameWorker, PostgresWorker]
   parsed_options.config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
+
+  EasyLogging.log_destination = parsed_options.config[:common][:worker_log]
+
   #TODO: Add option for specifying a config files
   option_parser = OptionParser.new do |options|
     options.banner = "Usage: launch_workers.rb [options]"

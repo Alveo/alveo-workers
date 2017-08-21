@@ -5,12 +5,16 @@ require_relative 'worker'
 require_relative 'models/item'
 require_relative 'models/document'
 require_relative 'postgres_helper'
+require 'easy_logging'
 
 class PostgresWorker < Worker
 
   include PostgresHelper
+  include EasyLogging
 
   def initialize(options)
+    logger.debug "#initialize"
+
     rabbitmq_options = options[:rabbitmq]
     super(rabbitmq_options)
     @activerecord_options = options[:activerecord]
@@ -26,6 +30,8 @@ class PostgresWorker < Worker
   end
 
   def start_batch_monitor
+    logger.debug "#start_batch_monitor"
+
     @batch_monitor = Thread.new {
       loop {
         sleep @batch_options[:timeout]
@@ -61,23 +67,53 @@ class PostgresWorker < Worker
   end
 
   def commit_batch
+    logger.debug "#commit_batch"
+
     @batch_mutex.synchronize {
-      item_imports = Item.import @item_headers, @item_batch, validate: false
-      item_ids = item_imports.ids
-      documents = []
-      item_ids.each_with_index { |id, i|
-        @documents_batch[i].each { |document|
-          document << id
-          documents << document
+      begin
+        item_imports = Item.import @item_headers, @item_batch, validate: true
+        logger.info "commit_batch: [#{item_imports.ids.size}] item(s) imported"
+
+        # the inserted items
+        item_ids = item_imports.ids
+
+        # failed items
+        item_failed_instances = item_imports.failed_instances
+
+        if !item_failed_instances.empty?
+          handles = []
+          item_failed_instances.each do |fi|
+            # failed items, duplicated ones?
+            # fi is item (model)
+            handles << fi.handle
+          end
+
+          logger.error "commit_batch: failed item(s) handle[#{handles}]"
+        end
+
+        documents = []
+        item_ids.each_with_index { |id, i|
+          @documents_batch[i].each { |document|
+            document << id
+            documents << document
+          }
         }
-      }
-      Document.import @documents_headers, documents, validate: false
-      @item_batch.clear
-      @documents_batch.clear
+        doc_imports = Document.import @documents_headers, documents, validate: true
+        logger.info "commit_batch: [#{doc_imports.ids.size}] document(s) imported"
+      rescue Exception => e
+        #     log error and raise again
+        logger.error "commit_batch: message[#{e.message}], backtrace[#{e.backtrace}]"
+        raise e
+      ensure
+        @item_batch.clear
+        @documents_batch.clear
+      end
     }
   end
 
   def process_message(headers, message)
+    logger.debug "#process_message"
+
     if headers['action'] == 'create'
       pg_statement = create_pg_statement(message)
       if @batch_options[:enabled]
@@ -91,6 +127,8 @@ class PostgresWorker < Worker
 
 
   def batch_create(pg_statement)
+    logger.debug "#batch_create"
+
     # TODO: change it array import method and turn off validations to
     # maximise import speed, see:
     #
@@ -110,6 +148,9 @@ class PostgresWorker < Worker
       document_values << document.values
     }
     @documents_batch << document_values
+
+    logger.debug "batch_create: item_size[#{@item_batch.size}], doc_size[#{@documents_batch.size}], batch_size[#{@batch_options[:size]}]"
+
     if (@item_batch.size >= @batch_options[:size])
       commit_batch
     end
@@ -117,6 +158,8 @@ class PostgresWorker < Worker
   end
 
   def create_item(pg_statement)
+    logger.debug "create_item"
+
     item = Item.new(pg_statement[:item])
     item.documents.build(pg_statement[:documents])
     item.save!

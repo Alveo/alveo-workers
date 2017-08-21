@@ -27,6 +27,7 @@ GEM
     coderay (1.1.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    easy_logging (0.2.0)
     ebnf (0.3.9)
       rdf (~> 1.1)
       sxp (~> 0.1, >= 0.1.3)
@@ -105,6 +106,7 @@ DEPENDENCIES
   activerecord
   activerecord-import
   bunny (>= 2.0.1)
+  easy_logging
   json
   json-ld
   net-http-persistent
@@ -119,4 +121,4 @@ DEPENDENCIES
   simplecov
 
 BUNDLED WITH
-   1.10.6
+   1.15.3

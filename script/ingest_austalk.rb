@@ -3,6 +3,9 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 require 'yaml'
 require 'json'
 require 'austalk_ingester'
+require 'easy_logging'
+
+include EasyLogging
 
 @ingesting = true
 @resume_point = -1
@@ -66,6 +69,8 @@ if __FILE__ == $PROGRAM_NAME
   Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   options = config[:ingester]
+
+  EasyLogging.log_destination = config[:common][:ingester_log]
   # usage ingest_austalk.rb <collection> <dir>
   # to ingest the named collection from the given directory full of .json files
   # if collection is ommitted, defaults to 'austalk'
