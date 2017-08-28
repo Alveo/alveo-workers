@@ -52,6 +52,13 @@ module SolrHelper
     item_metadata.each do |key, value|
         unless facets.include? key or excluded.include? key
             ns, name = key.split(':')
+
+            # KL: To be compatible with existing SOLR property name,
+            # DCTERMS => DC
+            if ns.upcase == 'DCTERMS'
+              ns = 'DC'
+            end
+
             key = "#{ns.upcase}_#{name}"
             value = remove_ns(value)
             result[:"#{key}_sim"] = value

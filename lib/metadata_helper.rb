@@ -11,8 +11,20 @@ module MetadataHelper
 
   @@COLLECTIONS = {}
 
+  # To judge whether a json is a item
+  #
+  # A json is a item only when:
+  #
+  # json['alveo:metadata']['dcterms:identifier'] is not empty
   def is_item?(jsonld)
-    not jsonld['alveo:metadata'].empty?
+    rlt = false
+
+    if !jsonld['alveo:metadata']['dcterms:identifier'].nil? && !jsonld['alveo:metadata']['dcterms:identifier'].empty?
+      logger.debug "is_item?: jsonld['alveo:metadata']['dcterms:identifier']=#{jsonld['alveo:metadata']['dcterms:identifier']}, TRUE"
+      rlt = true
+    end
+
+    rlt
   end
 
   def generate_fields(item)

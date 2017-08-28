@@ -39,7 +39,10 @@ class UploadWorker < Worker
   def create_item(item, collection)
     logger.debug "#create_item"
 
-    if is_item? item
+    # check whether current json is item or not
+    is_item = is_item? item
+
+    if is_item
       item['generated'] = generate_fields(item)
     end
 
@@ -49,7 +52,7 @@ class UploadWorker < Worker
     @exchange.publish(message, properties)
     logger.info "create_item: publish to [#{@sesame_queue.name}]"
 
-    if is_item? item
+    if is_item
       properties = {routing_key: @postgres_queue.name, headers: headers, persistent: true}
       @exchange.publish(message, properties)
       logger.info "create_item: publish to [#{@postgres_queue.name}]"
@@ -57,6 +60,8 @@ class UploadWorker < Worker
       properties = {routing_key: @solr_queue.name, headers: headers, persistent: true}
       @exchange.publish(message, properties)
       logger.info "create_item: publish to [#{@solr_queue.name}]"
+    else
+      logger.info "create_item: is NOT item, only publish to [#{@sesame_queue.name}]"
     end
   end
 
