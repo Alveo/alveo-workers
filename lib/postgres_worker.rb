@@ -71,7 +71,7 @@ class PostgresWorker < Worker
 
     @batch_mutex.synchronize {
       begin
-        item_imports = Item.import @item_headers, @item_batch, validate: true
+        item_imports = Item.import @item_headers, @item_batch, validate: false
         logger.info "commit_batch: [#{item_imports.ids.size}] item(s) imported"
 
         # the inserted items
@@ -98,7 +98,7 @@ class PostgresWorker < Worker
             documents << document
           }
         }
-        doc_imports = Document.import @documents_headers, documents, validate: true
+        doc_imports = Document.import @documents_headers, documents, validate: false
         logger.info "commit_batch: [#{doc_imports.ids.size}] document(s) imported"
       rescue Exception => e
         #     log error and raise again
@@ -124,7 +124,26 @@ class PostgresWorker < Worker
     end
   end
 
+  #
+  # Validate item:
+  #
+  # - check duplicate by handle
+  #
+  def validate_item(item)
+    rlt = false
 
+    handle = item[:handle]
+    item = Item.find_by_handle(handle)
+    if item.nil?
+    #   item not exists, valid
+      rlt = true
+    else
+    #   duplicated item
+      logger.warn "validate_item: duplicated item[#{handle}]"
+    end
+
+    rlt
+  end
 
   def batch_create(pg_statement)
     logger.debug "#batch_create"
@@ -140,7 +159,14 @@ class PostgresWorker < Worker
     # ids to the documents
     #
     @batch_mutex.synchronize {
-      @item_batch << pg_statement[:item].values
+      if validate_item(pg_statement[:item])
+      #   valid item
+        @item_batch << pg_statement[:item].values
+      else
+      #   invalid item
+        logger.warn "ignore invalid item[#{pg_statement[:item].values}]"
+      end
+
     }
     # @documents_batch << [pg_statement[:documents].first.values]
     document_values = []
@@ -160,9 +186,15 @@ class PostgresWorker < Worker
   def create_item(pg_statement)
     logger.debug "create_item"
 
-    item = Item.new(pg_statement[:item])
-    item.documents.build(pg_statement[:documents])
-    item.save!
+    begin
+      item = Item.new(pg_statement[:item])
+      item.documents.build(pg_statement[:documents])
+      item.save!
+    rescue Exception => e
+      # log the error only, don't need to process at this stage
+      logger.error "create_item: pg_statement[#{pg_statement}], errors[#{e.message}]"
+    end
+
   end
 
 end
