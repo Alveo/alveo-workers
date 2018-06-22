@@ -14,7 +14,7 @@ include EasyLogging
 @processed = 'austalk_processed.log'
 
 def get_file_paths(directory)
-  file_paths = Dir[File.join(directory, '*.json')]
+  file_paths = Dir[File.join(directory, '**', '*.json')]
   processed = []
   if File.exists? @processed
     processed = File.read(@processed).split

@@ -16,16 +16,16 @@ def main(collection_name)
   solr.commit
   ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
   if collection = Collection.where(name: collection_name).first
-          Item.where(collection_id: collection.id).delete_all
-      #Delete all documents that point to invalid items.
-      sql = "DELETE FROM documents WHERE item_id NOT IN (SELECT id FROM items);"
-      ActiveRecord::Base.connection.execute(sql)
+    Item.where(collection_id: collection.id).delete_all
+    #Delete all documents that point to invalid items.
+    sql = "DELETE FROM documents WHERE item_id NOT IN (SELECT id FROM items);"
+    ActiveRecord::Base.connection.execute(sql)
   end
   sesame = SesameClient.new(config[:sesame_worker])
   begin
-          sesame.clear_repository(collection_name)
+    sesame.clear_repository(collection_name)
   rescue Exception => e
-        puts e
+    puts e
   end
   sesame.close
 end

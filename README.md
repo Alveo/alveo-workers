@@ -40,3 +40,86 @@ The workers can also perform operations in batches to speed up inseration into t
 ## Ingesters
 
 Ingesters are a means to getting large quantiies of work onto the upload queues in the first place when going via the private route. Much like the worker launchers, Ingesters are spawned as groups of processes that divide up the work (e.g., a list of files or Trove chunks) before operating on them. Then Ingesters' task is convert any input data in a JSON-LD format that upload workers can consume.
+
+## Procedure to ingest collection
+
+### System check 
+
+Run system_check.sh to check.
+
+    [devel@alveo-app alveo-workers]$ . ./system_check.sh
+
+    Checking HCS vLab environment
+    Thu Jun 21 14:31:21 AEST 2018
+    Rails env= nci
+    Java Container url= http://localhost:8080/
+    Web App url= https://localhost/version.json
+    Attempt restart=
+    Free disk space= 711M
+    
+    Checking ActiveMQ...
+    + ActiveMQ is listening on port 8161 (status= 200)
+    + ActiveMQ is listening on port 61616
+    + ActiveMQ is listening on port 61613
+    
+    Checking the Java Container...
+    + It looks like Sesame is available (status= 200)
+    + It looks like Solr is available (status= 200)
+    
+    Checking A13g pollers...
+    + It looks like the A13g pollers are running (processes= 5)
+    
+    Checking the web app...
+    + The Web App is listening on port  (status= 200)
+    
+    Checking RabbitMQ...
+    + RabbitMQ is listening on port 5673
+    
+    Done.
+
+### Launch worker
+    
+    [devel@alveo-app alveo-workers]$ ruby script/launch_workers.rb -h
+    Usage: launch_workers.rb [options]
+    
+    Specific options:
+        -w (upload|solr|sesame|postgres)+,
+            --workers                    Comma separated list of workers to launch (default=all)
+        -d, --daemon                     Run as background daemon
+        -h, --help                       Show this help message
+
+**worker's log**
+
+There are 3 log files:
+
+- austalk_processed.log: contains all processed json file(s). If you want to re-ingest processed json file, just empty this log.
+- ingester.log: ingester main log 
+- worker.log: all workers(upload/solr/sesame/postgres) log.
+
+Remember, while worker is running, don't remove any log file. If you wnat to empty log, use below command:
+
+    truncate -s 0 *.log
+
+### Launch ingester
+
+Use below command to launch ingester:
+
+    Usage: ingest_austalk.rb <collection> <dir>
+
+In general, there would be a shell script to run the ingester program, e.g.,:
+
+    [devel@alveo-app alveo-workers]$ cat ingest_CDUD.sh
+    ruby script/ingest_austalk.rb austalk /local/austalk-postprocess-output/austalk/CDUD
+
+### Process monitor
+
+Use below command to create tunnel to monitor process:
+
+** For nci sesame/solr/rabbitmq/activemq-web **
+
+    ssh devel@app.alveo.edu.au -L 28080:10.0.0.11:8080 -L 28081:10.0.0.7:8080 -L 25673:10.0.0.14:15672 -L 28161:10.0.0.14:8161
+
+- sesame: http://localhost:28080/openrdf-workbench/repositories/austalk/summary
+- solr: http://localhost:28081/solr/#/hcsvlab/query
+- RabbitMQ: http://localhost:25673/#/queues (guest/guest)
+- ActiveMQ: http://localhost:28161/admin/queues.jsp (admin/admin)

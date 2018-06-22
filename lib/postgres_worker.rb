@@ -164,7 +164,9 @@ class PostgresWorker < Worker
         @item_batch << pg_statement[:item].values
       else
       #   invalid item
-        logger.warn "ignore invalid item[#{pg_statement[:item].values}]"
+        logger.warn "batch_create: ignore invalid item[#{pg_statement[:item].values}]"
+
+        return
       end
 
     }
