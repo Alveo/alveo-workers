@@ -69,6 +69,7 @@ if __FILE__ == $PROGRAM_NAME
   Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   options = config[:ingester]
+  options[:activerecord]= config[:postgres_worker][:activerecord]
 
   EasyLogging.log_destination = config[:common][:ingester_log]
   # usage ingest_austalk.rb <collection> <dir>
@@ -79,6 +80,6 @@ if __FILE__ == $PROGRAM_NAME
   elsif ARGV.length == 2
       main(options, ARGV[0], ARGV[1])
   else
-      puts "Usage: ingest_austalk.rb <collection>? <dir>"
+      puts "Usage: ingest_austalk.rb <collection> <dir>"
   end
 end

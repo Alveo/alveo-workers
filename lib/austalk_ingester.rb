@@ -1,6 +1,7 @@
 require 'bunny'
 require 'json'
 require 'easy_logging'
+require 'active_record'
 
 class AusTalkIngester
 
@@ -19,7 +20,7 @@ class AusTalkIngester
     logger.debug "@bunny_client.class.name[#{@bunny_client.class.name}]"
     @exchange_name = options[:exchange]
     @upload_queue_name = options[:upload_queue]
-
+    @activerecord_options = options[:activerecord]
 
   end
 
@@ -34,6 +35,8 @@ class AusTalkIngester
       @exchange = @channel.direct(@exchange_name, durable: true)
       logger.debug "@exchange = @channel.direct(@exchange_name, durable: true)...done"
       @upload_queue = add_queue(@upload_queue_name)
+      ActiveRecord::Base.establish_connection(@activerecord_options)
+
       monitor_queues
     rescue Exception => e
       logger.error "exception[#{e.message}]"
@@ -113,18 +116,60 @@ class AusTalkIngester
 
       austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
 
-      austalk_fields = add_document_sizes(austalk_fields)
+      # remove item(s) already ingested
+      austalk_fields = new_item_only(austalk_fields, collection)
 
-      properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: collection}}
+      logger.info "#process_chunk: found [#{austalk_fields['items'].size}] new item(s) to publish"
 
-      message = austalk_fields.to_json
+      if austalk_fields['items'].size > 0
+        austalk_fields = add_document_sizes(austalk_fields)
 
-      @exchange.publish(message, properties)
+        properties = {routing_key: @upload_queue.name, headers: {action: 'create', collection: collection}}
+
+        message = austalk_fields.to_json
+
+        @exchange.publish(message, properties)
+      end
+
     rescue Exception => e
       # TODO: Error queue instead of log file
       # logger.error "#{e.class}: #{e.to_s}\ninput: #{austalk_record}"
       logger.error "process_chunk: exception[#{e.message}]"
     end
+  end
+
+  #
+  # Only ingest new item.
+  #
+  # To collect handle from json:
+  #
+  # JSONPath: $.items[*].alveo:metadata.dcterms:identifier
+  #
+  # Ref:
+  # - http://jsonpath.com/
+  # - http://goessner.net/articles/JsonPath/index.html
+  def new_item_only(json, collection_name)
+    logger.debug "#new_item_only: start - json items[#{json['items'].size}], collection_name[#{collection_name}]"
+
+    json['items'].delete_if {|item|
+      if !item['alveo:metadata']['dcterms:identifier'].nil? && !item['alveo:metadata']['dcterms:identifier'].empty?
+        handle = "#{collection_name}:#{item['alveo:metadata']['dcterms:identifier']}"
+
+        #   check exits in DB
+        sql = "select id from items where handle='#{handle}';"
+        result = ActiveRecord::Base.connection.execute(sql)
+        if result.count > 0
+        #   already exists in DB
+          true
+        else
+          false
+        end
+      end
+    }
+
+    logger.debug "#new_item_only: end - json items[#{json['items'].size}]"
+
+    return json
   end
 
 end
